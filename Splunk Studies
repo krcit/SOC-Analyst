@@ -1,0 +1,36 @@
+1. List top 5 client that got most error in purchasing process using SPL.
+index=fundamentals sourcetype=access_combined_wcookie action=purchase file="error.do"
+| top clientip limit=5
+
+2. List clientips that got error in purchasing process. Change below mentioned field
+names as shown and sort clientips from top to bottom that got error more than 20 in
+purchasing process.
+(clientip = CustomerIP, count= Number_FailedOrder)
+index=fundamentals sourcetype=access_combined_wcookie action=purchase file="error.do"
+| rename clientip as CustomerIP
+| stats count as Number_FailedOrder by CustomerIP 
+| where Number_FailedOrder >20
+
+3. Show files that got more than 35MB internet traffic during December 2021
+index=fundamentals sourcetype=access_combined_wcookie date_year=2021 date_month=december
+| stats sum(bytes) as Total by file
+| eval Total_MB=Total/(1024*1024)
+| where Total_MB>35
+
+4. a)Show clientIPs and their number of processes for users who connected from
+Germany(use SPL codes).
+index=fundamentals sourcetype=access_combined_wcookie 
+| iplocation clientip 
+| stats count by Country,clientip
+| where Country="Germany"
+
+b)Sort clientIPs from maximum number of processes to minimum.
+index=fundamentals sourcetype=access_combined_wcookie 
+| iplocation clientip 
+| stats count as "Number of Process" by Country,clientip
+| where Country="Germany"
+| sort -"Number of Process"
+
+5. Create a workflow to detect the type of IP(Tor,VPN,Server)
+
+
